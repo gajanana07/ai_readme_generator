@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import apiClient from "../api/apiClient";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import "../index.css";
 
-const DashboardPage = () => {
+const DashboardPage = ({ onLogout }) => {
   const [user, setUser] = useState(null);
   const [repos, setRepos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,6 +15,7 @@ const DashboardPage = () => {
   const [viewMode, setViewMode] = useState("preview");
   const [chatInput, setChatInput] = useState("");
   const [isRefining, setIsRefining] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,9 +31,18 @@ const DashboardPage = () => {
       }
     };
     fetchData();
+
+    const savedMode = localStorage.getItem("darkMode") === "true";
+    setDarkMode(savedMode);
+    document.documentElement.classList.toggle("dark", savedMode);
   }, []);
 
-  //when searched
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    localStorage.setItem("darkMode", (!darkMode).toString());
+    document.documentElement.classList.toggle("dark", !darkMode);
+  };
+
   const filteredRepos = repos.filter((repo) =>
     repo.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -82,174 +93,124 @@ const DashboardPage = () => {
     alert("README content copied to clipboard!");
   };
 
-  if (loading) return <div>Loading dashboard...</div>;
+  if (loading) return <div className="flex items-center justify-center h-screen">Loading dashboard...</div>;
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Welcome, {user ? user.username : "Guest"}!</h1>
-      <p>Select a repository to generate a README for.</p>
-
-      <div style={{ display: "flex", gap: "20px" }}>
-        <div
-          style={{
-            width: "300px",
-            border: "1px solid #ccc",
-            borderRadius: "5px",
-          }}
-        >
-          <h2
-            style={{
-              padding: "10px",
-              margin: 0,
-              borderBottom: "1px solid #ccc",
-            }}
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors">
+      <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 shadow-md">
+        <h1 className="text-xl font-bold">Welcome, {user ? user.username : "Guest"}!</h1>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={toggleDarkMode}
+            className="px-3 py-1 bg-gray-300 dark:bg-gray-700 rounded hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
           >
-            Your Repositories
-          </h2>
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </button>
+          <button
+            onClick={onLogout}
+            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
 
-          <div style={{ padding: "10px", borderBottom: "1px solid #ccc" }}>
-            <input
-              type="text"
-              placeholder="Search repositories..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-            />
-          </div>
-
-          {filteredRepos.length > 0 ? (
-            <ul
-              style={{
-                listStyle: "none",
-                margin: 0,
-                padding: 0,
-                maxHeight: "60vh",
-                overflowY: "auto",
-              }}
-            >
-              {filteredRepos.map((repo) => (
-                <li
+      <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="md:col-span-1 bg-white dark:bg-gray-800 rounded shadow p-4">
+          <h2 className="font-bold mb-2">Your Repositories</h2>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full p-2 mb-4 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+          />
+          <div className="max-h-[60vh] overflow-y-auto">
+            {filteredRepos.length > 0 ? (
+              filteredRepos.map((repo) => (
+                <div
                   key={repo.id}
                   onClick={() => handleRepoSelect(repo)}
-                  style={{
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                    cursor: "pointer",
-                    backgroundColor:
-                      selectedRepo?.id === repo.id ? "#e0f7fa" : "transparent",
-                  }}
+                  className={`p-2 mb-2 rounded cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700 ${
+                    selectedRepo?.id === repo.id ? "bg-blue-200 dark:bg-blue-900" : ""
+                  }`}
                 >
-                  <strong>{repo.name}</strong>
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      margin: "4px 0 0 0",
-                      color: "#555",
-                    }}
-                  >
-                    {repo.description}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p style={{ padding: "10px" }}>No repositories found.</p>
-          )}
+                  <div className="font-semibold">{repo.name}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{repo.description}</div>
+                </div>
+              ))
+            ) : (
+              <p>No repositories found.</p>
+            )}
+          </div>
         </div>
 
-        <div
-          style={{
-            flex: 1,
-            padding: "20px",
-            border: "1px solid #ccc",
-            borderRadius: "5px",
-          }}
-        >
-
+        <div className="md:col-span-3 bg-white dark:bg-gray-800 rounded shadow p-4">
           {selectedRepo ? (
             <div>
-              <h2>{selectedRepo.name}</h2>
+              <h2 className="text-lg font-bold mb-4">{selectedRepo.name}</h2>
               {!readmeContent && !isAnalyzing && (
-                <button onClick={handleGenerateReadme}>
-                   Generate README
+                <button
+                  onClick={handleGenerateReadme}
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                >
+                  Generate README
                 </button>
               )}
               {isAnalyzing && <p>AI is thinking... please wait.</p>}
               {readmeContent && (
-                <>
-                  <div
-                    style={{
-                      marginBottom: "10px",
-                      display: "flex",
-                      gap: "10px",
-                      alignItems: "center",
-                    }}
-                  >
+                <div>
+                  <div className="flex gap-2 mb-4 items-center">
                     <button
                       onClick={() => setViewMode("preview")}
-                      disabled={viewMode === "preview"}
+                      className={`px-3 py-1 rounded ${viewMode === "preview" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700"}`}
                     >
                       Preview
                     </button>
                     <button
                       onClick={() => setViewMode("code")}
-                      disabled={viewMode === "code"}
+                      className={`px-3 py-1 rounded ${viewMode === "code" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700"}`}
                     >
                       Code
                     </button>
                     <button
                       onClick={handleCopyToClipboard}
-                      style={{ marginLeft: "auto" }}
+                      className="ml-auto px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
                     >
                       Copy Code
                     </button>
                   </div>
-                  <div
-                    style={{
-                      padding: "15px",
-                      border: "1px solid #eee",
-                      borderRadius: "5px",
-                      backgroundColor: "#f9f9f9",
-                      minHeight: "400px",
-                      maxHeight: "50vh",
-                      overflowY: "auto",
-                    }}
-                  >
+                  <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded h-[50vh] overflow-y-auto">
                     {viewMode === "preview" ? (
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {readmeContent}
                       </ReactMarkdown>
                     ) : (
-                      <pre
-                        style={{
-                          whiteSpace: "pre-wrap",
-                          wordBreak: "break-all",
-                        }}
-                      >
-                        <code>{readmeContent}</code>
-                      </pre>
+                      <pre className="whitespace-pre-wrap break-all font-mono text-sm">{readmeContent}</pre>
                     )}
                   </div>
-                  <div
-                    style={{ marginTop: "20px", display: "flex", gap: "10px" }}
-                  >
+                  <div className="flex mt-4 gap-2">
                     <input
                       type="text"
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
                       placeholder="e.g., 'Add a section about deployment'"
-                      style={{ flex: 1, padding: "8px" }}
+                      className="flex-1 p-2 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
                       disabled={isRefining}
                     />
-                    <button onClick={handleChatSubmit} disabled={isRefining}>
+                    <button
+                      onClick={handleChatSubmit}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      disabled={isRefining}
+                    >
                       {isRefining ? "Updating..." : "Refine"}
                     </button>
                   </div>
-                </>
+                </div>
               )}
             </div>
           ) : (
-            <p>Please select a repository from the list on the left.</p>
+            <p>Please select a repository from the left.</p>
           )}
         </div>
       </div>
