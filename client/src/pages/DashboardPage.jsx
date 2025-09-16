@@ -15,7 +15,6 @@ const DashboardPage = ({ onLogout }) => {
   const [viewMode, setViewMode] = useState("preview");
   const [chatInput, setChatInput] = useState("");
   const [isRefining, setIsRefining] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,17 +30,7 @@ const DashboardPage = ({ onLogout }) => {
       }
     };
     fetchData();
-
-    const savedMode = localStorage.getItem("darkMode") === "true";
-    setDarkMode(savedMode);
-    document.documentElement.classList.toggle("dark", savedMode);
   }, []);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    localStorage.setItem("darkMode", (!darkMode).toString());
-    document.documentElement.classList.toggle("dark", !darkMode);
-  };
 
   const filteredRepos = repos.filter((repo) =>
     repo.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -96,47 +85,44 @@ const DashboardPage = ({ onLogout }) => {
   if (loading) return <div className="flex items-center justify-center h-screen">Loading dashboard...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors">
-      <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 shadow-md">
-        <h1 className="text-xl font-bold">Welcome, {user ? user.username : "Guest"}!</h1>
+    <div className="m-0 p-0 min-h-screen bg-gradient-to-b from-green-500 to-black text-gray-800 transition-colors">
+      <div className="flex justify-between items-center p-4 bg-gray-200 rounded-lg shadow-md mt-4 mx-4">
+        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <img src="/logo.png" alt="Logo" className="w-8 h-8" />
+        </div>
         <div className="flex items-center gap-4">
-          <button
-            onClick={toggleDarkMode}
-            className="px-3 py-1 bg-gray-300 dark:bg-gray-700 rounded hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
-          >
-            {darkMode ? "Light Mode" : "Dark Mode"}
+          <button className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400 transition-colors">
+            About us
           </button>
-          <button
-            onClick={onLogout}
-            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-          >
+          <button onClick={onLogout} className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
             Logout
           </button>
         </div>
       </div>
-
       <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="md:col-span-1 bg-white dark:bg-gray-800 rounded shadow p-4">
-          <h2 className="font-bold mb-2">Your Repositories</h2>
-          <input
+        <input
             type="text"
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 mb-4 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+            className="w-full p-2 mt-2 mb-0 rounded border border-gray-300 bg-gray-50"
           />
+      </div>
+      <div className="pl-4 p-0 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="md:col-span-1 bg-white rounded shadow p-4">
+          <h2 className="font-bold mb-2">Your Repositories</h2>
           <div className="max-h-[60vh] overflow-y-auto">
             {filteredRepos.length > 0 ? (
               filteredRepos.map((repo) => (
                 <div
                   key={repo.id}
                   onClick={() => handleRepoSelect(repo)}
-                  className={`p-2 mb-2 rounded cursor-pointer hover:bg-blue-100 dark:hover:bg-gray-700 ${
-                    selectedRepo?.id === repo.id ? "bg-blue-200 dark:bg-blue-900" : ""
+                  className={`p-2 mb-2 rounded cursor-pointer hover:bg-blue-100 ${
+                    selectedRepo?.id === repo.id ? "bg-blue-200" : ""
                   }`}
                 >
                   <div className="font-semibold">{repo.name}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">{repo.description}</div>
+                  <div className="text-sm text-gray-500">{repo.description}</div>
                 </div>
               ))
             ) : (
@@ -145,7 +131,7 @@ const DashboardPage = ({ onLogout }) => {
           </div>
         </div>
 
-        <div className="md:col-span-3 bg-white dark:bg-gray-800 rounded shadow p-4">
+        <div className="md:col-span-3 bg-gray-500 rounded shadow p-4">
           {selectedRepo ? (
             <div>
               <h2 className="text-lg font-bold mb-4">{selectedRepo.name}</h2>
@@ -163,13 +149,13 @@ const DashboardPage = ({ onLogout }) => {
                   <div className="flex gap-2 mb-4 items-center">
                     <button
                       onClick={() => setViewMode("preview")}
-                      className={`px-3 py-1 rounded ${viewMode === "preview" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700"}`}
+                      className={`px-3 py-1 rounded ${viewMode === "preview" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
                     >
                       Preview
                     </button>
                     <button
                       onClick={() => setViewMode("code")}
-                      className={`px-3 py-1 rounded ${viewMode === "code" ? "bg-blue-500 text-white" : "bg-gray-300 dark:bg-gray-700"}`}
+                      className={`px-3 py-1 rounded ${viewMode === "code" ? "bg-blue-500 text-white" : "bg-gray-300"}`}
                     >
                       Code
                     </button>
@@ -180,7 +166,7 @@ const DashboardPage = ({ onLogout }) => {
                       Copy Code
                     </button>
                   </div>
-                  <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded h-[50vh] overflow-y-auto">
+                  <div className="p-4 bg-gray-100 rounded h-[50vh] overflow-y-auto">
                     {viewMode === "preview" ? (
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {readmeContent}
@@ -195,7 +181,7 @@ const DashboardPage = ({ onLogout }) => {
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
                       placeholder="e.g., 'Add a section about deployment'"
-                      className="flex-1 p-2 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+                      className="flex-1 p-2 rounded border border-gray-300 bg-gray-50"
                       disabled={isRefining}
                     />
                     <button
