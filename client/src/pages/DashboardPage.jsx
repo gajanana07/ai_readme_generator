@@ -82,152 +82,237 @@ const DashboardPage = ({ onLogout }) => {
     alert("README content copied to clipboard!");
   };
 
-  if (loading) return <div className="flex items-center justify-center h-screen">Loading dashboard...</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-b from-gray-900 via-green-800 to-black text-white text-lg">
+        <div className="animate-pulse px-6 py-4 rounded-2xl bg-black/40 backdrop-blur-sm">
+          Loading dashboard...
+        </div>
+      </div>
+    );
 
   return (
-    <div className="m-0 p-0 min-h-screen bg-gradient-to-b from-green-500 to-black text-gray-800 transition-colors">
-      <div className="flex justify-between items-center p-2 bg-black rounded-full shadow-md mx-4 relative top-2">
-        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-          <img src="/logo.png" alt="Logo" className="w-8 h-8" />
-        </div>
-        <div className="flex items-center gap-5 ">
-          <button className="px-5 py-1 bg-gray-300 rounded-full hover:bg-gray-400 transition-colors">
-            About us
-          </button>
-          <button onClick={onLogout} className="px-5 py-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
-            Logout
-          </button>
-        </div>
-      </div>
-  {/*Search box*/}
-  <div className="p-4 grid grid-cols-4 gap-3 opacity-70 pt-10">
-    <div className="relative w-full">
-      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-        <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.386a1 1 0 01-1.414 1.415l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z"
-            clipRule="evenodd"
-          />
-        </svg>  
-      </div>
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full p-2 pl-10 rounded-lg border border-gray-500 bg-gray-500 focus:outline-none focus:ring-2 focus:ring-black text-white"
-      />
-    </div>
-    <div></div>
-    {/*Welcome box*/}
-    <div>
-      <h1 className="text-4xl font-bold">Welcome, {user ? user.username : "Guest"}!</h1>
-    </div>
-  </div>
-
-    {/*Repositories box*/}
-      <div className="pl-4 p-0 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="md:col-span-1 bg-gray-500/50 rounded shadow p-4">
-          <h2 className="text-center font-bold mb-2">Your Repositories</h2>
-          <div className="max-h-[60vh] overflow-y-auto">
-            {filteredRepos.length > 0 ? (
-              filteredRepos.map((repo) => (
-              <div
-                key={repo.id}
-                onClick={() => handleRepoSelect(repo)}
-                className={`p-2 mb-2 rounded cursor-pointer ${
-                  selectedRepo?.id === repo.id
-                    ? "bg-white text-black" // no hover for selected
-                    : "bg-black text-white opacity-70 hover:bg-blue-200/25" // hover only for non-selected
-                }`}
-              >
-                <div className="font-semibold">{repo.name}</div>
-                <div className="text-sm text-gray-500">{repo.description}</div>
-              </div>
-              ))
-            ) : (
-              <p>No repositories found.</p>
-            )}
-          </div>
-        </div>
-          
-    {/*Answer box*/}
-        <div className="md:col-span-3 bg-gray-500/50 rounded shadow p-4 flex justify-center items-center relative right-2">
-          {selectedRepo ? (
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-green-800 to-black text-white font-sans">
+      {/* NAVBAR */}
+      <header className="mx-4 mt-4">
+        <nav className="flex items-center justify-between gap-4 p-3 bg-black/60 backdrop-blur-md rounded-xl shadow-lg border border-gray-800">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-green-400 to-green-600 flex items-center justify-center shadow-inner">
+              <img src="/logo.png" alt="Logo" className="w-7 h-7" />
+            </div>
             <div>
-              <h2 className="text-2xl font-bold mb-4 text-center">{selectedRepo.name}</h2>
-              {!readmeContent && !isAnalyzing && (
-                <button
-                  onClick={handleGenerateReadme}
-                  className="px-10 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                >
-                  Generate README
-                </button>
-              )}
-              {isAnalyzing && <p>AI is thinking... please wait.</p>}
-              {readmeContent && (
-                <div>
-                  <div className="flex gap-2 mb-4 items-center">
-                    <button
-                      onClick={() => setViewMode("preview")}
-                      className={`px-3 py-1 rounded-lg ${viewMode === "preview" ? "bg-gray-300 text-black" : "bg-green-500 hover:opacity-50 "}`}
-                    >
-                      Preview
-                    </button>
-                    <button
-                      onClick={() => setViewMode("code")}
-                      className={`px-3 py-1 rounded-lg ${viewMode === "code" ? "bg-gray-300 text-black" : "bg-green-500 hover:opacity-50 "}`}
-                    >
-                      Code
-                    </button>
-                    <button
-                      onClick={handleCopyToClipboard}
-                      className="ml-auto flex items-center gap-2 px-3 py-1 bg-white text-black rounded hover:opacity-50 transition-colors"
-                    >
-                      <img
-                        src="../../copy-icon.png"   // <-- your PNG file here
-                        alt="Copy"
-                        className="w-4 h-4"
-                      />
-                      Copy Code
-                    </button>
+              <div className="text-sm text-gray-300">Welcome back</div>
+              <div className="font-semibold text-lg text-green-200">
+                {user ? user.username : "Guest"}
+              </div>
+            </div>
+          </div>
 
+          {/* WEBSITE NAME instead of search bar */}
+          <div className="hidden md:block text-2xl font-bold text-green-400 tracking-wide">
+            AI README Generator
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800/60 hover:bg-gray-700 transition transform hover:scale-105 border border-gray-700">
+              <svg
+                className="w-4 h-4 text-green-300"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  d="M12 2v6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M12 16v6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              About Us
+            </button>
+            <button
+              onClick={onLogout}
+              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 transform hover:scale-105 transition font-medium"
+            >
+              Logout
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      {/* LAYOUT */}
+      <main className="p-6 md:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* SIDEBAR */}
+          <aside className="md:col-span-1 bg-gray-900/60 backdrop-blur rounded-2xl p-4 shadow-lg border border-gray-800 h-[70vh] md:sticky md:top-6 overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Your Repositories</h3>
+              <span className="text-sm text-gray-400">{repos.length}</span>
+            </div>
+
+            <div className="mb-3 hidden md:block">
+              <input
+                type="text"
+                placeholder="Filter..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full p-2 pl-3 rounded-md bg-black/30 border border-gray-800 text-white placeholder-gray-400 focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+
+            <div className="overflow-y-auto max-h-[60vh] pr-2">
+              {filteredRepos.length > 0 ? (
+                filteredRepos.map((repo) => (
+                  <div
+                    key={repo.id}
+                    onClick={() => handleRepoSelect(repo)}
+                    className={`p-3 mb-3 rounded-xl cursor-pointer transition-shadow hover:shadow-xl border border-transparent ${
+                      selectedRepo?.id === repo.id
+                        ? "bg-gradient-to-r from-green-500/80 to-green-400/70 text-black border-green-300"
+                        : "bg-gray-800/40 hover:bg-gray-800/60"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="font-semibold truncate">{repo.name}</div>
+                      <div className="text-xs text-gray-300">
+                        {repo.private ? "Private" : "Public"}
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-400 mt-1 truncate">
+                      {repo.description || "No description"}
+                    </div>
                   </div>
-                  <div className="p-4 bg-gray-300 rounded h-[50vh] overflow-y-auto">
-                    {viewMode === "preview" ? (
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {readmeContent}
-                      </ReactMarkdown>
+                ))
+              ) : (
+                <p className="text-center text-gray-500 mt-8">
+                  No repositories found.
+                </p>
+              )}
+            </div>
+          </aside>
+
+          {/* MAIN AREA */}
+          <section className="md:col-span-3 bg-gray-900/50 backdrop-blur rounded-2xl p-6 shadow-lg border border-gray-800 min-h-[70vh] flex flex-col">
+            {selectedRepo ? (
+              <>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-green-200">
+                      {selectedRepo.name}
+                    </h2>
+                    <p className="text-sm text-gray-400 mt-1">
+                      {selectedRepo.description || "No description"}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {!readmeContent && !isAnalyzing && (
+                      <button
+                        onClick={handleGenerateReadme}
+                        className="px-5 py-2 rounded-full bg-gradient-to-r from-green-500 to-green-600 font-semibold shadow hover:translate-y-[-2px] transform transition"
+                      >
+                        Generate README
+                      </button>
+                    )}
+
+                    {isAnalyzing && (
+                      <div className="px-4 py-2 rounded-full bg-black/40 text-gray-300 animate-pulse">
+                        AI analyzing...
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setViewMode("preview")}
+                        className={`px-3 py-2 rounded-lg font-medium transition ${
+                          viewMode === "preview"
+                            ? "bg-green-500 text-black"
+                            : "bg-gray-800/30 hover:bg-gray-800"
+                        }`}
+                      >
+                        Preview
+                      </button>
+                      <button
+                        onClick={() => setViewMode("code")}
+                        className={`px-3 py-2 rounded-lg font-medium transition ${
+                          viewMode === "code"
+                            ? "bg-green-500 text-black"
+                            : "bg-gray-800/30 hover:bg-gray-800"
+                        }`}
+                      >
+                        Code
+                      </button>
+                      <button
+                        onClick={handleCopyToClipboard}
+                        className="px-3 py-2 rounded-lg bg-white text-black font-medium hover:bg-gray-200 transition"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-hidden flex flex-col">
+                  <div className="p-4 rounded-lg bg-gradient-to-b from-black/40 to-black/20 border border-gray-800 h-[60vh] overflow-y-auto custom-scrollbar">
+                    {readmeContent ? (
+                      viewMode === "preview" ? (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {readmeContent} 
+                        </ReactMarkdown>
+                      ) : (
+                        <pre className="whitespace-pre-wrap break-all font-mono text-sm text-gray-200">
+                          {readmeContent}
+                        </pre>
+                      )
                     ) : (
-                      <pre className="whitespace-pre-wrap break-all font-mono text-sm">{readmeContent}</pre>
+                      <div className="flex items-center justify-center h-full text-gray-400">
+                        Select "Generate README" to create content for this
+                        repository.
+                      </div>
                     )}
                   </div>
-                  <div className="flex mt-4 gap-2">
+
+                  {/* refinement area */}
+                  <div className="mt-4 flex flex-col md:flex-row gap-3 items-stretch">
                     <input
                       type="text"
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      placeholder="e.g., 'Add a section about deployment'"
-                      className="flex-1 p-2 rounded border border-gray-300 bg-gray-50"
+                      placeholder="e.g., Add a section about deployment"
+                      className="flex-1 p-3 rounded-lg border border-gray-700 bg-black/40 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                       disabled={isRefining}
                     />
                     <button
                       onClick={handleChatSubmit}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                       disabled={isRefining}
+                      className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition disabled:opacity-60"
                     >
                       {isRefining ? "Updating..." : "Refine"}
                     </button>
                   </div>
                 </div>
-              )}
-            </div>
-          ) : (
-            <p>Please select a repository from the left.</p>
-          )}
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold text-gray-300">
+                    No repository selected
+                  </h3>
+                  <p className="text-gray-500 mt-2">
+                    Please select a repository from the left to get started.
+                  </p>
+                </div>
+              </div>
+            )}
+          </section>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
