@@ -31,3 +31,27 @@
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
+
+/* Make scrollbar almost invisible */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px; /* super thin */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 0, 0.2); /* barely visible green */
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 0, 0.5); /* more visible on hover */
+}
+
+/* Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 0, 0.2) transparent;
+}
