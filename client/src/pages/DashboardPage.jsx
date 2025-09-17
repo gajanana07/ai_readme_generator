@@ -258,7 +258,7 @@ const DashboardPage = ({ onLogout }) => {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden flex flex-col">hover:scrollbar-thumb-green-600
+                <div className="flex-1 overflow-hidden flex flex-col">
                   <div className="p-4 rounded-lg bg-gradient-to-b from-black/40 to-black/20 border border-gray-800 h-[60vh] overflow-y-auto custom-scrollbar">
                     {readmeContent ? (
                       viewMode === "preview" ? (
