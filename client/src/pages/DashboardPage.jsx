@@ -92,7 +92,7 @@ const DashboardPage = ({ onLogout }) => {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-green-800 to-black text-white font-sans">
+    <div className="fixed inset-0 bg-gradient-to-b from-gray-900 via-green-800 to-black text-white font-sans ">
       {/* NAVBAR */}
       <header className="mx-4 mt-4">
         <nav className="flex items-center justify-between gap-4 p-3 bg-black/60 backdrop-blur-md rounded-xl shadow-lg border border-gray-800">
@@ -115,25 +115,6 @@ const DashboardPage = ({ onLogout }) => {
 
           <div className="flex items-center gap-3">
             <button className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800/60 hover:bg-gray-700 transition transform hover:scale-105 border border-gray-700">
-              <svg
-                className="w-4 h-4 text-green-300"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <path
-                  d="M12 2v6"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 16v6"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
               About Us
             </button>
             <button
@@ -175,7 +156,7 @@ const DashboardPage = ({ onLogout }) => {
                     className={`p-3 mb-3 rounded-xl cursor-pointer transition-shadow hover:shadow-xl border border-transparent ${
                       selectedRepo?.id === repo.id
                         ? "bg-gradient-to-r from-green-500/80 to-green-400/70 text-black border-green-300"
-                        : "bg-gray-800/40 hover:bg-gray-800/60"
+                        : "bg-gray-900 hover:bg-gray-900 transform hover:scale-95 transition-all duration-300 ease-out hover:shadow-lg"
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -198,7 +179,7 @@ const DashboardPage = ({ onLogout }) => {
           </aside>
 
           {/* MAIN AREA */}
-          <section className="md:col-span-3 bg-gray-900/50 backdrop-blur rounded-2xl p-6 shadow-lg border border-gray-800 min-h-[70vh] flex flex-col">
+          <section className="md:col-span-3 bg-gray-900/50 backdrop-blur rounded-2xl p-6 shadow-lg border border-gray-800 h-[80vh] flex flex-col">
             {selectedRepo ? (
               <>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
@@ -226,40 +207,42 @@ const DashboardPage = ({ onLogout }) => {
                         AI analyzing...
                       </div>
                     )}
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setViewMode("preview")}
-                        className={`px-3 py-2 rounded-lg font-medium transition ${
-                          viewMode === "preview"
-                            ? "bg-green-500 text-black"
-                            : "bg-gray-800/30 hover:bg-gray-800"
-                        }`}
-                      >
-                        Preview
-                      </button>
-                      <button
-                        onClick={() => setViewMode("code")}
-                        className={`px-3 py-2 rounded-lg font-medium transition ${
-                          viewMode === "code"
-                            ? "bg-green-500 text-black"
-                            : "bg-gray-800/30 hover:bg-gray-800"
-                        }`}
-                      >
-                        Code
-                      </button>
                       <button
                         onClick={handleCopyToClipboard}
-                        className="px-3 py-2 rounded-lg bg-white text-black font-medium hover:bg-gray-200 transition"
+                        className="px-3 py-2 rounded-lg bg-white text-black font-medium 
+                      hover:bg-gray-200 hover:scale-110 hover:shadow-2lg 
+                        transform transition duration-300 ease-out"
+
                       >
                         Copy
                       </button>
                     </div>
                   </div>
-                </div>
 
+                  <div className="flex items-center gap-2 mb-0">
+                  <button
+                    onClick={() => setViewMode("preview")}
+                    className={`px-4 py-2 rounded-t-lg font-medium transition ${ 
+                        viewMode === "preview"
+                        ? "rounded-b-none border border-gray-800 bg-gradient-to-b from-black/40 to-black/20 text-white mb-0"
+                        : "bg-green-500 text-black hover:bg-green-600 shadow-2xl hover:scale-105 hover:shadow-2xl rounded-t-2xl rounded-b-2xl mb-2"
+                    }`}
+                  >
+                    Preview
+                  </button>
+                  <button
+                    onClick={() => setViewMode("code")}
+                    className={`px-4 py-2 rounded-t-lg font-medium transition ${ 
+                          viewMode === "code"
+                        ? "rounded-b-none border border-gray-800 bg-gradient-to-b from-black/40 to-black/20 text-white mb-0" 
+                        : "bg-green-500 text-black hover:bg-green-600 shadow-2xl hover:scale-105 hover:shadow-2xl rounded-t-2xl rounded-b-2xl mb-2"
+                    }`}
+                  >
+                    Code
+                  </button>
+                </div>
                 <div className="flex-1 overflow-hidden flex flex-col">
-                  <div className="p-4 rounded-lg bg-gradient-to-b from-black/40 to-black/20 border border-gray-800 h-[60vh] overflow-y-auto custom-scrollbar">
+                  <div className="p-4 rounded-b-lg border border-gray-800 bg-gradient-to-b from-black/40 to-black/20 h-[60vh] overflow-y-auto custom-scrollbar">
                     {readmeContent ? (
                       viewMode === "preview" ? (
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -291,7 +274,7 @@ const DashboardPage = ({ onLogout }) => {
                     <button
                       onClick={handleChatSubmit}
                       disabled={isRefining}
-                      className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition disabled:opacity-60"
+                      className="px-5 py-2 rounded-lg bg-green-500 hover:bg-green-700 transform hover:scale-105 transition disabled:opacity-60"
                     >
                       {isRefining ? "Updating..." : "Refine"}
                     </button>
