@@ -4,8 +4,10 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Copy as CopyIcon } from "lucide-react";
 import "../index.css";
+import { useNavigate } from "react-router-dom";
 
 const DashboardPage = ({ onLogout }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [repos, setRepos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -243,12 +245,16 @@ const DashboardPage = ({ onLogout }) => {
             AI README Generator
           </div>
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-end">
-            <button className="flex-1 sm:flex-none items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-700/40 to-green-900/30 hover:from-green-600/50 hover:to-green-800/40 transition-all duration-300 border border-green-700">
+            <button
+              onClick={() => navigate("/about")}
+              className="px-4 py-2 rounded-md transition-transform duration-300 text-base hover:scale-125 active:scale-95"
+            >
               About Us
             </button>
+
             <button
               onClick={handleLogout}
-              className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-gradient-to-r from-green-700/40 to-green-900/30 hover:from-green-600/50 hover:to-green-800/40 transition-all duration-300 font-medium border border-green-700"
+              className="px-4 py-2 rounded-md transition-transform duration-300 text-base hover:scale-125 hover:text-red-600 active:scale-95"
             >
               Logout
             </button>
@@ -357,46 +363,50 @@ const DashboardPage = ({ onLogout }) => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 mb-2">
-                  <button
-                    onClick={() => setViewMode("preview")}
-                    className={`px-3 py-1.5 rounded-t-lg font-medium ${
-                      viewMode === "preview"
-                        ? "border border-gray-800 bg-black/40 text-white"
-                        : "bg-green-500 text-black hover:bg-green-600"
-                    }`}
-                  >
-                    Preview
-                  </button>
-                  <button
-                    onClick={() => setViewMode("code")}
-                    className={`px-3 py-1.5 rounded-t-lg font-medium ${
-                      viewMode === "code"
-                        ? "border border-gray-800 bg-black/40 text-white"
-                        : "bg-green-500 text-black hover:bg-green-600"
-                    }`}
-                  >
-                    Code
-                  </button>
-                </div>
+                <div className="flex flex-col">
+                  {/* Tab Buttons */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setViewMode("preview")}
+                      className={`px-3 py-1.5 font-medium rounded-t-lg z-10 ${
+                        viewMode === "preview"
+                          ? "border border-gray-800 border-b-0 bg-black/20 text-white"
+                          : "border border-gray-800 bg-green-500 text-black hover:bg-green-600 rounded-b-lg rounded-t-lg"
+                      }`}
+                    >
+                      Preview
+                    </button>
+                    <button
+                      onClick={() => setViewMode("code")}
+                      className={`px-3 py-1.5 font-medium rounded-t-lg z-10 ${
+                        viewMode === "code"
+                          ? "border border-gray-800 border-b-0 bg-black/20 text-white"
+                          : "border border-gray-800 bg-green-500 text-black hover:bg-green-600 rounded-b-lg rounded-t-lg"
+                      }`}
+                    >
+                      Code
+                    </button>
+                  </div>
 
-                <div className="flex-1 overflow-hidden flex flex-col">
-                  <div className="p-4 rounded-b-lg border border-gray-800 bg-black/20 max-h-[50vh] md:h-[60vh] overflow-y-auto custom-scrollbar">
-                    {readmeContent ? (
-                      viewMode === "preview" ? (
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {readmeContent}
-                        </ReactMarkdown>
+                  {/* Content Box */}
+                  <div className="flex-1 overflow-hidden flex flex-col">
+                    <div className="p-4 rounded-b-lg border border-gray-800 bg-black/20 max-h-[50vh] md:h-[60vh] overflow-y-auto custom-scrollbar relative z-0 border-t-0">
+                      {readmeContent ? (
+                        viewMode === "preview" ? (
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {readmeContent}
+                          </ReactMarkdown>
+                        ) : (
+                          <pre className="whitespace-pre-wrap break-words font-mono text-sm text-gray-200">
+                            {readmeContent}
+                          </pre>
+                        )
                       ) : (
-                        <pre className="whitespace-pre-wrap break-words font-mono text-sm text-gray-200">
-                          {readmeContent}
-                        </pre>
-                      )
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-gray-400">
-                        Select "Generate README" to create content.
-                      </div>
-                    )}
+                        <div className="flex items-center justify-center h-full text-gray-400">
+                          Select "Generate README" to create content.
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {readmeContent && (
@@ -453,6 +463,9 @@ const DashboardPage = ({ onLogout }) => {
             )}
           </section>
         </div>
+        <footer className="w-full text-center text-[15px] text-gray-500 py-2 mt-6">
+          © 2025 Name. All rights reserved.
+        </footer>
       </main>
     </div>
   );

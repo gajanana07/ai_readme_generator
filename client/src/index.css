@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 /* Add this to your CSS file (index.css or similar) */
 
 @keyframes spin-slow {
@@ -20,7 +19,8 @@
 
 /* Optional: Add some additional enhancements */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -55,5 +55,3 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 255, 0, 0.2) transparent;
 }
-
-
