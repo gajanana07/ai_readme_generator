@@ -204,7 +204,7 @@ const DashboardPage = ({ onLogout }) => {
   }
 
   return (
-    <div className="fixed bg-gradient-to-b from-gray-900 via-green-800 to-black text-white font-sans overflow-x-hidden w-full min-h-screen">
+    <div className="overflow-y-auto md:overflow-y-hidden bg-gradient-to-b from-gray-900 via-green-800 to-black text-white font-sans overflow-x-hidden w-full min-h-screen md:fixed">
       {/* NAVBAR */}
       <header className="mt-4 fixed top-0 left-0 z-50 w-full px-2">
         <nav className="mt-1 md:mt-4 p-3 bg-black/60 backdrop-blur-md rounded-3xl md:rounded-3xl shadow-lg border border-gray-800 transition-all duration-300">
@@ -424,7 +424,7 @@ const DashboardPage = ({ onLogout }) => {
           </section>
         </div>
 
-        <footer className="w-full text-center text-[15px] text-gray-500 py-2 mt-2">
+        <footer className="w-full text-center text-[15px] text-gray-500 py-2 mt-0">
           © 2025 Name. All rights reserved.
         </footer>
       </main>

@@ -159,7 +159,6 @@ const HomePage = ({ onLogin }) => {
         onError={(e) => console.warn("Background video failed to load:", e)}
       />
       <div className="absolute inset-0 z-20">
-        
         <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-white rounded-full animate-ping opacity-40"></div>
         <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-green-300 rounded-full animate-bounce opacity-50"></div>
       </div>
