@@ -3,7 +3,6 @@ name: workflow
 on:
   push:
     branches:
-      - main
       - Santosh
     paths-ignore:
       - 'README.md'
