@@ -7,6 +7,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# Accept build argument for VITE_SERVER_URL
+ARG VITE_SERVER_URL
+ENV VITE_SERVER_URL=$VITE_SERVER_URL
+
 # Copy source code and build
 COPY . .
 RUN npm run build   # builds static files into /app/dist
