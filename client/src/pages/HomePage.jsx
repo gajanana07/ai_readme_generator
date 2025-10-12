@@ -3,7 +3,7 @@ import "../index.css";
 import githubOctocat from "../../public/inspectocat.png";
 
 const HomePage = ({ onLogin }) => {
-  const GITHUB_AUTH_URL = "http://localhost:8000/api/auth/github";
+  const GITHUB_AUTH_URL = `${import.meta.env.VITE_SERVER_URL}/api/auth/github`;
 
   const [showIntroVideo, setShowIntroVideo] = useState(false);
   const [showLoginContent, setShowLoginContent] = useState(false);
