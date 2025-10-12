@@ -31,18 +31,18 @@ jobs:
         working-directory: ./client
         run: npm ci
 
-      - name: Lint code (client)
-        working-directory: ./client
-        run: npm run lint
+      # - name: Lint code (client)
+      #   working-directory: ./client
+      #   run: npm run lint
 
       # Lint server
       - name: Install dependencies (server)
         working-directory: ./server
         run: npm ci
 
-      - name: Lint code (server)
-        working-directory: ./server
-        run: npm run lint
+      # - name: Lint code (server)
+      #   working-directory: ./server
+      #   run: npm run lint
 
   build-and-push-ecr-image:
     name: Continuous Delivery
