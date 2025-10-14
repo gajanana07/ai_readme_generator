@@ -68,7 +68,7 @@ jobs:
           IMAGE_TAG: latest
         run: |
           # Build images
-          docker build --build-arg VITE_SERVER_URL=https://54.226.25.123:8000 -t $ECR_REGISTRY/$ECR_REPOSITORY:client-$IMAGE_TAG client/
+          docker build --build-arg VITE_SERVER_URL=http://174.129.187.229:8000 -t $ECR_REGISTRY/$ECR_REPOSITORY:client-$IMAGE_TAG client/
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:server-$IMAGE_TAG server/
 
           # Push images
@@ -137,7 +137,7 @@ jobs:
             -e GITHUB_CLIENT_ID=Ov23liR5VJgiyQJWKwTo \
             -e GITHUB_CLIENT_SECRET=2a26e8862389627f6a92e01bc7fcd3aaea7cb39f \
             -e MONGO_URI="mongodb+srv://gajnayak07:21tWeyV0AZxwyhoZ@readmeai.98hjzp5.mongodb.net/?retryWrites=true&w=majority&appName=readmeai" \
-            -e CLIENT_URL=http://54.85.53.141:5173 \
-            -e JWT_SECRET=ffaaab974c19be2ae5522414d629b77d1a55b008c9b9c540 \
+            -e CLIENT_URL=http://52.90.128.123:5173 \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             -e GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} \
             $ECR_REGISTRY/$ECR_REPOSITORY:server-$IMAGE_TAG
