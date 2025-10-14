@@ -135,9 +135,9 @@ jobs:
           docker run -d --name server -p 8000:8000 \
             -e PORT=8000 \
             -e GITHUB_CLIENT_ID=Ov23liR5VJgiyQJWKwTo \
-            -e GITHUB_CLIENT_SECRET=2a26e8862389627f6a92e01bc7fcd3aaea7cb39f \
+            -e GITHUB_CLIENT_SECRET=ea516b9cd00a9f7d06956c8f42057e2ffec76f69 \
             -e MONGO_URI="mongodb+srv://gajnayak07:21tWeyV0AZxwyhoZ@readmeai.98hjzp5.mongodb.net/?retryWrites=true&w=majority&appName=readmeai" \
             -e CLIENT_URL=http://52.90.128.123:5173 \
-            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e JWT_SECRET=bafca3b4cbc8f489364d370c6667b3757790632739c1d0e248e37aaf7fb147c7313c25e8fa29b7d175164b35e92de4f8a5a37bfc3e3449cc9a21574aaa747af4 \
             -e GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} \
             $ECR_REGISTRY/$ECR_REPOSITORY:server-$IMAGE_TAG

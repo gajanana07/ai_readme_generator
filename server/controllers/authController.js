@@ -61,13 +61,14 @@ export const handleGitHubCallback = async (req, res) => {
     const token = jwt.sign(
       { id: user._id }, // Payload: contains user's unique MongoDB ID
       process.env.JWT_SECRET, // The secret key to sign the token
-      { expiresIn: "1d" } // Token will expire in 1 day
+      { expiresIn: "7d" } // Token will expire in 1 day
     );
 
     res.cookie("jwt", token, {
       httpOnly: true, // Prevents browser JavaScript from accessing the cookie
-      secure: process.env.NODE_ENV !== "development", // Use secure cookies in production
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      secure: false,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 day
     });
 
     console.log("User saved/updated:", user.username);
