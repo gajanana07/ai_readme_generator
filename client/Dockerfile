@@ -1,31 +1,35 @@
-# Build stage
+# ---------- Build stage ----------
 FROM node:20-bullseye AS build
 
 WORKDIR /app
 
-# Copy and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Accept build argument for VITE_SERVER_URL
+# Accept build argument for Vite and Nginx
 ARG VITE_SERVER_URL
 ENV VITE_SERVER_URL=$VITE_SERVER_URL
 
-# Copy source code and build
+# Copy source and build frontend
 COPY . .
 RUN npm run build   # builds static files into /app/dist
 
-# Serve stage
+
+# ---------- Serve stage ----------
 FROM nginx:alpine
 
-# Copy static build files to Nginx folder
+# Accept the same build arg again
+ARG VITE_SERVER_URL
+ENV VITE_SERVER_URL=$VITE_SERVER_URL
+
+# Copy static files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy and replace placeholder in nginx.conf
+COPY nginx/templates/default.conf.template /tmp/default.conf.template
 
-# Expose port 80 for frontend
+# Replace the variable at build time
+RUN envsubst '$VITE_SERVER_URL' < /tmp/default.conf.template > /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
-
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
