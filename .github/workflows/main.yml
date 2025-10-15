@@ -135,7 +135,7 @@ jobs:
           docker run -d --name server -p 8000:8000 \
             -e PORT=8000 \
             -e GITHUB_CLIENT_ID=Ov23liR5VJgiyQJWKwTo \
-            -e GITHUB_CLIENT_SECRET=ea516b9cd00a9f7d06956c8f42057e2ffec76f69 \
+            -e GITHUB_CLIENT_SECRET=80316f18652346ff02dc2a4e55c79dea071c32a2 \
             -e MONGO_URI="mongodb+srv://gajnayak07:21tWeyV0AZxwyhoZ@readmeai.98hjzp5.mongodb.net/?retryWrites=true&w=majority&appName=readmeai" \
             -e CLIENT_URL=http://44.222.201.58:5173 \
             -e JWT_SECRET=e6LVRQCThyhFzh+/FUamG+rHIyttYyeFYhjCAZGNJA8= \
