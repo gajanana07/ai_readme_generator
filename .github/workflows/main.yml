@@ -75,102 +75,39 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:client-$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:server-$IMAGE_TAG
 
-  # Continuous-Deployment-Client:
-  #   needs: build-and-push-ecr-image
-  #   runs-on: [self-hosted, client]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
-
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v1
-
-  #     - name: Pull and run client
-  #       env:
-  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-  #         ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
-  #         IMAGE_TAG: latest
-  #       run: |
-  #         docker system prune -f
-  #         docker pull $ECR_REGISTRY/$ECR_REPOSITORY:client-$IMAGE_TAG
-  #         docker rm -f client || true
-  #         docker run -d --name client -p 5173:80 \
-  #           $ECR_REGISTRY/$ECR_REPOSITORY:client-$IMAGE_TAG
-
-  # Continuous-Deployment-Server:
-  #   needs: build-and-push-ecr-image
-  #   runs-on: [self-hosted, server]
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
-
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v1
-
-  #     - name: Pull and run server
-  #       env:
-  #         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-  #         ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
-  #         IMAGE_TAG: latest
-  #       run: |
-  #         docker system prune -f
-  #         docker pull $ECR_REGISTRY/$ECR_REPOSITORY:server-$IMAGE_TAG
-  #         docker rm -f server || true
-  #         docker run -d --name server -p 8000:8000 \
-  #           -e PORT=8000 \
-  #           -e GITHUB_CLIENT_ID=Ov23liR5VJgiyQJWKwTo \
-  #           -e GITHUB_CLIENT_SECRET=80316f18652346ff02dc2a4e55c79dea071c32a2 \
-  #           -e MONGO_URI="mongodb+srv://gajnayak07:21tWeyV0AZxwyhoZ@readmeai.98hjzp5.mongodb.net/?retryWrites=true&w=majority&appName=readmeai" \
-  #           -e CLIENT_URL=http://44.222.201.58:5173 \
-  #           -e JWT_SECRET=e6LVRQCThyhFzh+/FUamG+rHIyttYyeFYhjCAZGNJA8= \
-  #           -e GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} \
-  #           $ECR_REGISTRY/$ECR_REPOSITORY:server-$IMAGE_TAG
-
   Continuous-Deployment:
-  needs: build-and-push-ecr-image
-  runs-on: [self-hosted, ai-readme]
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    name: Continuous Deployment
+    needs: build-and-push-ecr-image
+    runs-on: [self-hosted, ai-readme]
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Pull and run containers using Docker Compose
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
-        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-      run: |
-        docker system prune -f
-        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:client-latest
-        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:server-latest
-        export ECR_REGISTRY=$ECR_REGISTRY
-        export ECR_REPOSITORY=$ECR_REPOSITORY
-        export GROQ_API_KEY=$GROQ_API_KEY
-        docker compose down || true
-        docker compose up -d
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Pull and run containers using Docker Compose
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          docker system prune -f
+          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:client-latest
+          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:server-latest
+
+          export ECR_REGISTRY=$ECR_REGISTRY
+          export ECR_REPOSITORY=$ECR_REPOSITORY
+          export GROQ_API_KEY=$GROQ_API_KEY
+
+          docker compose down || true
+          docker compose up -d
