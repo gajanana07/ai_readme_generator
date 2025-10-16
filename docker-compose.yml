@@ -9,7 +9,7 @@ services:
       - GITHUB_CLIENT_ID=Ov23liR5VJgiyQJWKwTo
       - GITHUB_CLIENT_SECRET=80316f18652346ff02dc2a4e55c79dea071c32a2
       - MONGO_URI=mongodb+srv://gajnayak07:21tWeyV0AZxwyhoZ@readmeai.98hjzp5.mongodb.net/?retryWrites=true&w=majority&appName=readmeai
-      - CLIENT_URL=http://13.222.172.143
+      - CLIENT_URL=http://107.20.77.59
       - JWT_SECRET=e6LVRQCThyhFzh+/FUamG+rHIyttYyeFYhjCAZGNJA8=
       - GROQ_API_KEY=${GROQ_API_KEY}
     ports:

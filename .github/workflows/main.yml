@@ -68,7 +68,7 @@ jobs:
           IMAGE_TAG: latest
         run: |
           # Build images
-          docker build --no-cache --build-arg VITE_SERVER_URL=http://13.222.172.143:8000 -t $ECR_REGISTRY/$ECR_REPOSITORY:client-$IMAGE_TAG client/
+          docker build --no-cache --build-arg VITE_SERVER_URL=http://107.20.77.59:8000 -t $ECR_REGISTRY/$ECR_REPOSITORY:client-$IMAGE_TAG client/
           docker build --no-cache -t $ECR_REGISTRY/$ECR_REPOSITORY:server-$IMAGE_TAG server/
 
           # Push images
