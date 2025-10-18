@@ -6,20 +6,27 @@ export const protect = async (req, res, next) => {
 
   if (req.cookies.jwt) {
     try {
-      // 1. Verify the token
+      // 1. Get token from cookie
       token = req.cookies.jwt;
+
+      // 2. Verify the token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // 2. Find the user by ID and attach them to the request
+      // 3. Find the user by ID and attach them to the request
       // Exclude the accessToken for security
-      req.user = await User.findById(decoded.id).select("-accessToken");
+      const user = await User.findById(decoded.id).select("-accessToken");
+
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      req.user = user;
       next();
     } catch (error) {
-      res.status(401).json({ message: "Not authorized, token failed" });
+      console.error("Token verification failed:", error.message);
+      return res.status(401).json({ message: "Not authorized, token invalid" });
     }
-  }
-
-  if (!token) {
-    res.status(401).json({ message: "Not authorized, no token" });
+  } else {
+    return res.status(401).json({ message: "Not authorized, no token" });
   }
 };

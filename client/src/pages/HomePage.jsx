@@ -2,39 +2,24 @@ import React, { useState, useEffect } from "react";
 import "../index.css";
 import githubOctocat from "../../public/inspectocat.png";
 
-const HomePage = ({ onLogin }) => {
+const HomePage = () => {
   const GITHUB_AUTH_URL = "http://localhost:8000/api/auth/github";
 
   const [showIntroVideo, setShowIntroVideo] = useState(false);
   const [showLoginContent, setShowLoginContent] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [videoError, setVideoError] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
-    // This effect runs once when the component mounts.
-    const clearAuthData = () => {
-      try {
-        localStorage.removeItem("authToken");
-        sessionStorage.clear();
-      } catch (error) {
-        console.error("Error clearing auth data:", error);
-      }
-    };
-
-    clearAuthData();
-
     const initializePage = () => {
       try {
         const videoPlayed = localStorage.getItem("videoPlayed");
-        const isMobile = window.innerWidth < 768; // Tailwind's 'md' breakpoint
+        const isMobile = window.innerWidth < 768;
 
         // Show intro video only if it hasn't been played AND we are on a desktop device.
         if (!videoPlayed && !isMobile) {
           setShowIntroVideo(true);
         } else {
-          // On mobile, or if the video has been played, show login content directly.
           setShowLoginContent(true);
           // If we are skipping the video on mobile for the first time,
           // set the flag so it doesn't play on a future desktop visit.
@@ -44,15 +29,12 @@ const HomePage = ({ onLogin }) => {
         }
       } catch (error) {
         console.error("Error accessing localStorage:", error);
-        setShowLoginContent(true); // Fallback to showing login content
-      } finally {
-        setIsLoading(false);
+        setShowLoginContent(true);
       }
     };
 
     // Add a small delay for smooth page load
     const timer = setTimeout(initializePage, 300);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -66,11 +48,10 @@ const HomePage = ({ onLogin }) => {
         setTimeout(() => {
           setShowLoginContent(true);
           setIsTransitioning(false);
-        }, 100); // Short delay for the login content to fade in
-      }, 300); // Matches the transition duration
+        }, 100);
+      }, 300);
     } catch (error) {
       console.error("Error transitioning to login:", error);
-      // Fallback behavior
       setShowIntroVideo(false);
       setShowLoginContent(true);
       setIsTransitioning(false);
@@ -87,39 +68,11 @@ const HomePage = ({ onLogin }) => {
 
   const handleVideoError = () => {
     console.error("Video failed to load");
-    setVideoError(true);
     setShowIntroVideo(false);
     setShowLoginContent(true);
-    setIsLoading(false);
   };
 
-  const handleLoginClick = () => {
-    try {
-      setIsLoading(true);
-      if (onLogin) {
-        onLogin();
-      }
-      // Browser will handle the navigation to GITHUB_AUTH_URL
-    } catch (error) {
-      console.error("Error during login:", error);
-      setIsLoading(false);
-      alert("There was an error starting the login process. Please try again.");
-    }
-  };
-
-  // Loading Spinner
-  if (isLoading && !showIntroVideo && !showLoginContent) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-          <div className="text-white text-lg font-medium">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  // Intro Video Player (Now only for desktop)
+  // Intro Video Player (Desktop only)
   if (showIntroVideo) {
     return (
       <div className="relative flex items-center justify-center min-h-screen bg-black">
@@ -184,7 +137,7 @@ const HomePage = ({ onLogin }) => {
           />
 
           <div
-            className="w-full max-w-lg" // Responsive width
+            className="w-full max-w-lg"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
@@ -201,7 +154,7 @@ const HomePage = ({ onLogin }) => {
                     </span>
                   </div>
                   <h1 className="text-4xl lg:text-5xl font-black leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-green-100 to-green-200 mb-4">
-                    README Generator
+                    ReadMe AI
                   </h1>
                   <p className="text-lg text-white/80 leading-relaxed">
                     Transform your projects with{" "}
@@ -230,48 +183,36 @@ const HomePage = ({ onLogin }) => {
 
                   <a
                     href={GITHUB_AUTH_URL}
-                    onClick={handleLoginClick}
                     role="button"
                     aria-label="Sign in with GitHub"
-                    className={`group w-full sm:w-auto inline-flex justify-center items-center gap-3 px-8 py-4 rounded-2xl font-semibold bg-gradient-to-r from-neutral-900/95 to-neutral-800/95 border border-white/20 text-white shadow-xl hover:shadow-2xl transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-black relative overflow-hidden transform hover:scale-105 ${
-                      isLoading ? "opacity-75 cursor-wait" : ""
-                    }`}
-                    disabled={isLoading}
+                    className="group w-full sm:w-auto inline-flex justify-center items-center gap-3 px-8 py-4 rounded-2xl font-semibold bg-gradient-to-r from-neutral-900/95 to-neutral-800/95 border border-white/20 text-white shadow-xl hover:shadow-2xl transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-black relative overflow-hidden transform hover:scale-105"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                    {isLoading ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    ) : (
-                      <svg
-                        className="w-5 h-5 transition-transform duration-300 group-hover:rotate-12"
-                        viewBox="0 0 16 16"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2 .37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.67.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.58.82-2.14-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82a7.68 7.68 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.27.82 2.14 0 3.07-1.87 3.75-3.65 3.95.28.24.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-                        />
-                      </svg>
-                    )}
-                    <span className="relative z-10">
-                      {isLoading ? "Starting..." : "Continue with GitHub"}
-                    </span>
-                    {!isLoading && (
-                      <svg
-                        className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    )}
+                    <svg
+                      className="w-5 h-5 transition-transform duration-300 group-hover:rotate-12"
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2 .37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.67.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.58.82-2.14-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82a7.68 7.68 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.27.82 2.14 0 3.07-1.87 3.75-3.65 3.95.28.24.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+                      />
+                    </svg>
+                    <span className="relative z-10">Continue with GitHub</span>
+                    <svg
+                      className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
                   </a>
                 </div>
               </div>

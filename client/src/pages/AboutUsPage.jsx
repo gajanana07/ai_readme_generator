@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import InfoCard from "../components/InfoCard";
 import { FileText, Zap, CheckCircle, Layers } from "lucide-react";
 import { motion } from "framer-motion"; // 👈 animations
+import logo from "../../public/logoo.png";
 
 export default function About() {
   const navigate = useNavigate();
@@ -63,12 +64,8 @@ export default function About() {
         viewport={{ once: true }}
       >
         <div className="flex items-center justify-center gap-4">
-          <img
-            src="/img.png"
-            alt="Project Icon"
-            className="w-12 h-12 opacity-80"
-          />
-          <h1 className="text-5xl font-extrabold">About Name</h1>
+          <img src={logo} alt="Project Icon" className="w-16 h-16" />
+          <h1 className="text-5xl font-extrabold">ReadMe AI</h1>
         </div>
 
         <p className="mt-4 text-gray-400 text-lg">
@@ -87,10 +84,10 @@ export default function About() {
             <span className="absolute -z-10 left-0 bottom-1 w-full h-4 bg-[url('/images/watercolor-stroke.png')] bg-cover opacity-40"></span>
           </h2>
           <p className="text-lg leading-relaxed text-gray-200">
-            At Name, we believe great projects deserve great documentation. Our
-            platform harnesses AI to create clear, structured, and professional
-            README files—helping developers save time, showcase their work
-            effectively, and focus on building what truly matters.
+            At ReadMe AI, we believe great projects deserve great documentation.
+            Our platform harnesses AI to create clear, structured, and
+            professional README files—helping developers save time, showcase
+            their work effectively, and focus on building what truly matters.
           </p>
         </motion.div>
       </motion.div>

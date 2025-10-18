@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import "../index.css";
 import { useNavigate } from "react-router-dom";
+import logo from "../../public/logoo.png";
 
 const DashboardPage = ({ onLogout }) => {
   const navigate = useNavigate();
@@ -22,8 +23,8 @@ const DashboardPage = ({ onLogout }) => {
   const [viewMode, setViewMode] = useState("preview");
   const [chatInput, setChatInput] = useState("");
   const [isRefining, setIsRefining] = useState(false);
-  const [authError, setAuthError] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 👈 for mobile sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,37 +39,18 @@ const DashboardPage = ({ onLogout }) => {
             console.error("Failed to fetch repositories:", repoError);
             setRepos([]);
           }
-          setLoading(false);
         } else {
-          console.error("Invalid user data received");
-          setAuthError(true);
-          setTimeout(() => onLogout(), 2000);
+          throw new Error("Invalid user data");
         }
       } catch (error) {
-        console.error("Authentication failed:", error);
-        setAuthError(true);
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          setTimeout(() => onLogout(), 2000);
-        } else {
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
-        }
+        console.error("Failed to load dashboard:", error);
+        onLogout();
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, [onLogout]);
-
-  // Prevent going back
-  useEffect(() => {
-    const handlePopState = (event) => {
-      event.preventDefault();
-      window.history.pushState(null, "", window.location.href);
-    };
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
 
   const filteredRepos = repos.filter(
     (repo) =>
@@ -79,7 +61,9 @@ const DashboardPage = ({ onLogout }) => {
     setSelectedRepo(repo);
     setReadmeContent("");
     setViewMode("preview");
-    setIsSidebarOpen(false); // 👈 auto close sidebar on mobile after selecting
+    setIsSidebarOpen(false);
+    const mainArea = document.getElementById("main-readme-area");
+    if (mainArea) mainArea.scrollTop = 0;
   };
 
   const handleGenerateReadme = async () => {
@@ -99,7 +83,7 @@ const DashboardPage = ({ onLogout }) => {
       console.error("Failed to generate README:", error);
       let errorMessage = "An error occurred during README generation.";
       if (error.response?.status === 401) {
-        errorMessage = "Authentication expired. Please log in again.";
+        errorMessage = "Session expired. Please log in again.";
         setTimeout(() => onLogout(), 2000);
       } else if (error.response?.status === 404) {
         errorMessage = "Repository not found or not accessible.";
@@ -133,7 +117,7 @@ const DashboardPage = ({ onLogout }) => {
       setChatInput(originalInput);
       let errorMessage = "An error occurred during refinement.";
       if (error.response?.status === 401) {
-        errorMessage = "Authentication expired. Please log in again.";
+        errorMessage = "Session expired. Please log in again.";
         setTimeout(() => onLogout(), 2000);
       } else if (error.response?.status >= 500) {
         errorMessage = "Server error. Please try again later.";
@@ -165,58 +149,44 @@ const DashboardPage = ({ onLogout }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("videoPlayed");
-    onLogout();
+    setIsLoggingOut(true);
+    setTimeout(() => {
+      localStorage.removeItem("videoPlayed");
+      onLogout();
+    }, 500);
   };
 
-  if (loading || authError || !user) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 via-green-800 to-black">
         <div className="flex flex-col items-center space-y-4">
-          {authError ? (
-            <>
-              <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center animate-pulse">
-                <div className="w-6 h-6 text-red-400">⚠</div>
-              </div>
-              <div className="text-white text-lg font-medium">
-                Authentication failed
-              </div>
-              <div className="text-gray-400 text-sm text-center">
-                {loading
-                  ? "Redirecting to login..."
-                  : "Please try logging in again"}
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-              <div className="text-white text-lg font-medium">
-                Loading dashboard...
-              </div>
-              <div className="text-gray-400 text-sm animate-pulse">
-                Fetching your repositories...
-              </div>
-            </>
-          )}
+          <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="text-white text-lg font-medium">
+            Loading dashboard...
+          </div>
         </div>
       </div>
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="overflow-y-auto md:overflow-y-hidden bg-gradient-to-b from-gray-900 via-green-800 to-black text-white font-sans overflow-x-hidden w-full min-h-screen md:fixed">
       {/* NAVBAR */}
-      <header className="mt-4 fixed top-0 left-0 z-50 w-full px-2">
+      <header className="mt-2 fixed top-0 left-0 z-50 w-full px-2">
         <nav className="mt-1 md:mt-4 p-3 bg-black/60 backdrop-blur-md rounded-3xl md:rounded-3xl shadow-lg border border-gray-800 transition-all duration-300">
           {/* Top row (mobile only): Logo + Welcome on left, Title center */}
           <div className="relative flex items-center justify-start md:hidden mb-3">
             {/* Left: Logo + Welcome */}
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-green-400 to-green-600 flex items-center justify-center shadow-inner">
-                <img src="/logo.png" alt="Logo" className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-inner">
+                <img src={logo} alt="Logo" className="w-12 h-12" />
               </div>
               <div>
-                <div className="text-sm text-gray-300">Welcome!</div>
+                <div className="text-sm text-gray-300">Welcome</div>
                 <div className="font-semibold text-lg text-green-200">
                   {user.username}
                 </div>
@@ -225,7 +195,7 @@ const DashboardPage = ({ onLogout }) => {
 
             {/* Center: Title */}
             <div className="ml-auto text-xl font-bold text-green-400 tracking-wide">
-              AI README Generator
+              ReadMe AI
             </div>
           </div>
 
@@ -233,11 +203,11 @@ const DashboardPage = ({ onLogout }) => {
           <div className="flex items-center justify-between">
             {/* Left: Logo + Welcome (desktop only) */}
             <div className="hidden md:flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-green-400 to-green-600 flex items-center justify-center shadow-inner">
-                <img src="/logo.png" alt="Logo" className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-full  flex items-center justify-center shadow-inner">
+                <img src={logo} alt="Logo" className="w-12 h-12" />
               </div>
               <div>
-                <div className="text-sm text-gray-300">Welcome!</div>
+                <div className="text-sm text-gray-300">Welcome</div>
                 <div className="font-semibold text-lg text-green-200">
                   {user.username}
                 </div>
@@ -245,8 +215,8 @@ const DashboardPage = ({ onLogout }) => {
             </div>
 
             {/* Center: Title (desktop only) */}
-            <div className="hidden md:flex md:flex-1 justify-center text-2xl font-bold text-green-400 tracking-wide">
-              AI README Generator
+            <div className="hidden md:flex md:flex-1 justify-center text-3xl font-bold text-green-400 tracking-wide ">
+              ReadMe AI
             </div>
 
             {/* Left (mobile only): Side panel button */}
@@ -261,22 +231,33 @@ const DashboardPage = ({ onLogout }) => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => navigate("/about")}
-                className="px-4 py-2 rounded-md transition-transform duration-300 text-base hover:scale-125 active:scale-95"
+                className="px-4 py-2 rounded-md transition-transform duration-200 text-base hover:scale-105 active:scale-95"
               >
                 About Us
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 rounded-md transition-transform duration-300 text-base hover:scale-125 hover:text-red-600 active:scale-95"
+                disabled={isLoggingOut}
+                className="... disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Logout
+                {isLoggingOut ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin  "></div>
+                  </>
+                ) : (
+                  <>
+                    <button className="px-4 py-2 rounded-md transition-transform duration-200 text-base hover:scale-105 active:scale-95 text-red-400">
+                      Logout
+                    </button>
+                  </>
+                )}
               </button>
             </div>
           </div>
         </nav>
       </header>
 
-      <main className="mt-32 p-4 md:p-8 min-h-screen">
+      <main className="mt-20 pt-16 p-4 md:p-8 min-h-screen">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* SIDEBAR - DESKTOP */}
           <aside className="hidden md:block md:col-span-1">
@@ -290,88 +271,100 @@ const DashboardPage = ({ onLogout }) => {
           </aside>
 
           {/* MAIN AREA */}
-          <section className="mt-4 md:mt-0 md:col-span-3 bg-gray-900/50 backdrop-blur rounded-2xl p-4 md:p-6 shadow-lg border border-gray-800 flex flex-col min-h-[70vh]">
-            {/* ... (Main content same as before) ... */}
+          <section
+            className="mt-4 md:mt-0 md:col-span-3 bg-gray-900/50 backdrop-blur rounded-2xl p-4 md:p-6 shadow-lg border border-gray-800 flex flex-col min-h-[70vh]"
+            style={{ maxHeight: "calc(100vh - 112px)" }}
+          >
             {selectedRepo ? (
               <>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
                   <h2 className="text-2xl font-bold text-green-200">
                     {selectedRepo.name}
                   </h2>
+
+                  {/* Large separated action buttons */}
                   <div className="flex items-center space-x-3">
                     {!readmeContent && !isAnalyzing && (
                       <button
                         onClick={handleGenerateReadme}
-                        className="px-6 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-black shadow-lg transition-all"
+                        className="px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transform transition hover:scale-105 bg-gradient-to-r from-green-500 to-green-600 text-black border border-green-700"
                       >
                         Generate README
                       </button>
                     )}
+
                     {isAnalyzing && (
-                      <div className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-green-500/20 text-green-300">
+                      <div className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-green-700/20 shadow-lg">
                         <div className="w-4 h-4 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div>
                         <span className="text-sm font-medium">
                           AI analyzing...
                         </span>
                       </div>
                     )}
+
                     {readmeContent && (
-                      <button
-                        onClick={handleCopyToClipboard}
-                        className="p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-gray-600 transition-all"
-                        aria-label="Copy to clipboard"
-                      >
-                        <CopyIcon size={18} className="text-gray-300" />
-                      </button>
+                      <>
+                        <button
+                          onClick={() => setViewMode("preview")}
+                          className={`px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transform transition hover:scale-105 border ${
+                            viewMode === "preview"
+                              ? "bg-green-600 text-black border-green-700"
+                              : "bg-gray-800/40 text-white border-gray-700"
+                          }`}
+                          aria-pressed={viewMode === "preview"}
+                        >
+                          Preview
+                        </button>
+
+                        <button
+                          onClick={() => setViewMode("code")}
+                          className={`px-4 py-2 rounded-lg text-sm font-semibold shadow-lg transform transition hover:scale-105 border ${
+                            viewMode === "code"
+                              ? "bg-green-600 text-black border-green-700"
+                              : "bg-gray-800/40 text-white border-gray-700"
+                          }`}
+                          aria-pressed={viewMode === "code"}
+                        >
+                          Code
+                        </button>
+
+                        <button
+                          onClick={handleCopyToClipboard}
+                          className="px-3 py-2 rounded-lg text-sm font-semibold shadow-lg transform transition hover:scale-110 text-white flex items-center gap-2"
+                          aria-label="Copy README to clipboard"
+                        >
+                          <CopyIcon size={16} />
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setViewMode("preview")}
-                      className={`px-3 py-1.5 font-medium rounded-t-lg z-10 ${
-                        viewMode === "preview"
-                          ? "border border-gray-800 border-b-0 bg-black/20 text-white"
-                          : "border border-gray-800 bg-green-500 text-black hover:bg-green-600 rounded-b-lg rounded-t-lg"
-                      }`}
-                    >
-                      Preview
-                    </button>
-                    <button
-                      onClick={() => setViewMode("code")}
-                      className={`px-3 py-1.5 font-medium rounded-t-lg z-10 ${
-                        viewMode === "code"
-                          ? "border border-gray-800 border-b-0 bg-black/20 text-white"
-                          : "border border-gray-800 bg-green-500 text-black hover:bg-green-600 rounded-b-lg rounded-t-lg"
-                      }`}
-                    >
-                      Code
-                    </button>
-                  </div>
-
-                  <div className="p-4 rounded-b-lg border border-gray-800 bg-black/20 max-h-[50vh] md:h-[60vh] overflow-y-auto custom-scrollbar relative z-0 border-t-0">
-                    {readmeContent ? (
-                      viewMode === "preview" ? (
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {readmeContent}
-                        </ReactMarkdown>
-                      ) : (
-                        <pre className="whitespace-pre-wrap break-words font-mono text-sm text-gray-200">
-                          {readmeContent}
-                        </pre>
-                      )
+                {/* Readme display area */}
+                <div
+                  id="main-readme-area"
+                  className="p-4 rounded-lg border border-gray-800 bg-black/20 overflow-y-auto custom-scrollbar relative z-0 mt-2"
+                  style={{ maxHeight: "calc(100vh - 300px)" }}
+                >
+                  {readmeContent ? (
+                    viewMode === "preview" ? (
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {readmeContent}
+                      </ReactMarkdown>
                     ) : (
-                      <div className="flex items-center justify-center h-full text-gray-400">
-                        Select "Generate README" to create content.
-                      </div>
-                    )}
-                  </div>
+                      <pre className="whitespace-pre-wrap break-words font-mono text-sm text-gray-200">
+                        {readmeContent}
+                      </pre>
+                    )
+                  ) : (
+                    <div className="flex items-center justify-center h-64 text-gray-400">
+                      Select "Generate README" to create content.
+                    </div>
+                  )}
                 </div>
 
                 {readmeContent && (
-                  <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                  <div className="mt-6 flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
                       value={chatInput}
@@ -392,7 +385,7 @@ const DashboardPage = ({ onLogout }) => {
                     <button
                       onClick={handleChatSubmit}
                       disabled={isRefining || !chatInput.trim()}
-                      className="px-6 py-3 text-sm rounded-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-black shadow-lg transition-all disabled:opacity-50 font-medium"
+                      className="px-6 py-3 text-sm rounded-lg bg-gradient-to-r from-green-600 to-green-700 hover:from-bg-green-600 hover:border-green-700 text-black shadow-lg transition-all disabled:opacity-50 font-medium"
                     >
                       {isRefining ? (
                         <div className="flex items-center space-x-2">
@@ -429,7 +422,7 @@ const DashboardPage = ({ onLogout }) => {
         </footer>
       </main>
 
-      {/* 👇 MOBILE SIDEBAR OVERLAY */}
+      {/* MOBILE SIDEBAR OVERLAY */}
       <div
         className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity ${
           isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"
@@ -437,7 +430,7 @@ const DashboardPage = ({ onLogout }) => {
         onClick={() => setIsSidebarOpen(false)}
       ></div>
 
-      {/* 👇 MOBILE SIDEBAR PANEL */}
+      {/* MOBILE SIDEBAR PANEL */}
       <div
         className={`fixed top-0 left-0 h-full w-72 bg-gray-900 shadow-2xl z-50 transform transition-transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -464,7 +457,7 @@ const DashboardPage = ({ onLogout }) => {
   );
 };
 
-// 👇 Extracted sidebar content into a separate component to avoid duplication
+// SidebarContent now keeps the repo list scrollable and the search input pinned to the bottom
 const SidebarContent = ({
   repos,
   searchTerm,
@@ -472,17 +465,18 @@ const SidebarContent = ({
   selectedRepo,
   handleRepoSelect,
 }) => (
-  <div className="bg-gray-900/60 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-800/50 overflow-hidden h-full flex flex-col">
-    <div className="p-4 border-b border-gray-800/50">
-      <input
-        type="text"
-        placeholder="Search repositories..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full px-3 py-2 text-sm bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-700 transition-all"
-      />
-    </div>
-    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+  <div className="py-3 bg-gray-900/60 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-800/50 overflow-hidden h-[calc(100vh-112px)] flex flex-col">
+    {/* Repo list (scrollable) */}
+    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 ">
+      <div className="p-1 border-b border-gray-800/40 bg-transparent">
+        <input
+          type="text"
+          placeholder="Search repositories..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-4 py-2 text-sm bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-700"
+        />
+      </div>
       {repos.length > 0 ? (
         repos.map((repo) => (
           <div
