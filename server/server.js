@@ -17,7 +17,13 @@ const PORT = process.env.PORT || 8000;
 connectDB();
 
 // Middleware
-app.use(cors());
+//app.use(cors());
+app.use(
+  cors({
+    origin: "https://readmeaigenerator.netlify.app",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser()); 
 
