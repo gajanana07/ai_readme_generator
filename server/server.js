@@ -17,11 +17,10 @@ const PORT = process.env.PORT || 8000;
 connectDB();
 
 // Middleware
-//app.use(cors());
 app.use(
   cors({
-    origin: "https://readmeaigenerator.netlify.app",
-    credentials: true,
+    origin: process.env.CLIENT_URL, // Allow requests from your client
+    credentials: true, // Allow cookies to be sent
   })
 );
 app.use(express.json());
@@ -33,8 +32,6 @@ app.use("/api/user", userRoutes);
 app.use("/api/github", githubRoutes);
 app.use("/api/ai", aiRoutes);
 
-
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Server is running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

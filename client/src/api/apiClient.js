@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "https://ai-readme-generator-xng3.onrender.com/api",//"http://localhost:8000/api", // Your backend API URL
+  baseURL: "http://localhost:8000/api", // Your backend API URL
   withCredentials: true, // tells axios to send cookies
 });
 
